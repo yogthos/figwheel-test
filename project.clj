@@ -74,16 +74,16 @@
       :pretty-print false
       :closure-warnings
       {:externs-validation :off :non-standard-jsdoc :off}}}}}
-  
+
   :figwheel
   {:http-server-root "public"
    :nrepl-port 7002
    :css-dirs ["resources/public/css"]}
-  
+
 
   :profiles
   {:uberjar {:omit-source true
-             
+
              :prep-tasks ["compile" ["cljsbuild" "once" "min"]]
              :aot :all
              :uberjar-name "figwheel-test.jar"
@@ -98,16 +98,18 @@
                                  [ring/ring-mock "0.3.0"]
                                  [ring/ring-devel "1.5.0"]
                                  [pjstadig/humane-test-output "0.8.0"]
-                                 [lein-figwheel "0.5.4"]
+                                 [lein-figwheel "0.5.4"
+                                  :exclusions [slimple-lein-profile-merge]]
                                  [lein-doo "0.1.6"]
                                  [binaryage/devtools "0.6.1"]
                                  [com.cemerick/piggieback "0.2.2-SNAPSHOT"]]
                   :plugins      [[com.jakemccrary/lein-test-refresh "0.14.0"]
-                                 [lein-figwheel "0.5.4"]
+                                 [lein-figwheel "0.5.4"
+                                  :exclusions [slimple-lein-profile-merge]]
                                  [figwheel-sidecar "0.5.4"]
                                  [lein-doo "0.1.6"]
                                  [org.clojure/clojurescript "1.9.36"]]
-                  
+
                   :doo {:build "test"}
                   :source-paths ["env/dev/clj" "test/clj"]
                   :resource-paths ["env/dev/resources"]
