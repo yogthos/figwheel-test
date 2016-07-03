@@ -1,4 +1,4 @@
-(ns figwheel-test.app
+(ns figwheel-test.prod
   (:require [figwheel-test.core :as core]))
 
 ;;ignore println statements in prod

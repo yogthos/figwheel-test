@@ -1,25 +1,43 @@
 (ns figwheel-test.handler
-  (:require [compojure.core :refer [routes wrap-routes]]
-            [figwheel-test.layout :refer [error-page]]
-            [figwheel-test.routes.home :refer [home-routes]]
-            [compojure.route :as route]
-            [figwheel-test.env :refer [defaults]]
-            [mount.core :as mount]
-            [figwheel-test.middleware :as middleware]))
+  (:require [compojure.core :refer [GET defroutes]]
+            [compojure.route :refer [not-found resources]]
+            [hiccup.page :refer [include-js include-css html5]]
+            [figwheel-test.middleware :refer [wrap-middleware]]
+            [config.core :refer [env]]))
 
-(mount/defstate init-app
-                :start ((or (:init defaults) identity))
-                :stop  ((or (:stop defaults) identity)))
+(def mount-target
+  [:div#app
+      [:h3 "ClojureScript has not been compiled!"]
+      [:p "please run "
+       [:b "lein figwheel"]
+       " in order to start the compiler"]])
 
-(def app-routes
-  (routes
-    (-> #'home-routes
-        (wrap-routes middleware/wrap-csrf)
-        (wrap-routes middleware/wrap-formats))
-    (route/not-found
-      (:body
-        (error-page {:status 404
-                     :title "page not found"})))))
+(defn head []
+  [:head
+   [:meta {:charset "utf-8"}]
+   [:meta {:name "viewport"
+           :content "width=device-width, initial-scale=1"}]
+   (include-css (if (env :dev) "/css/site.css" "/css/site.min.css"))])
 
+(def loading-page
+  (html5
+    (head)
+    [:body {:class "body-container"}
+     mount-target
+     (include-js "/js/app.js")]))
 
-(defn app [] (middleware/wrap-base #'app-routes))
+(def cards-page
+  (html5
+    (head)
+    [:body
+     mount-target
+     (include-js "/js/app_devcards.js")]))
+
+(defroutes routes
+  (GET "/" [] loading-page)
+  (GET "/about" [] loading-page)
+  (GET "/cards" [] cards-page)
+  (resources "/")
+  (not-found "Not Found"))
+
+(def app (wrap-middleware #'routes))
